@@ -8,7 +8,10 @@ import {
   findNextProjectRoot,
   findMiddlewarePath,
   getMiddlewareWritePath,
+  findProxyPath,
+  getProxyWritePath,
   generateMiddlewareContent,
+  generateProxyContent,
   runInit,
   MATCHER_SNIPPET,
   MATCHER_BLOCK_SNIPPET,
@@ -181,9 +184,65 @@ describe('init-middleware', () => {
       expect(out).toContain("'/foo/:path*'");
     });
 
+    it('snippets use @tommyvez/passfort/next', () => {
+      expect(MATCHER_SNIPPET).toContain('@tommyvez/passfort/next');
+      expect(MATCHER_BLOCK_SNIPPET).toContain('@tommyvez/passfort/next');
+    });
+
     it('snippets are valid strings', () => {
       expect(MATCHER_SNIPPET.trim().length).toBeGreaterThan(0);
       expect(MATCHER_BLOCK_SNIPPET.trim().length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('findProxyPath', () => {
+    it('returns null when no proxy file exists', () => {
+      writeFileSync(
+        join(tmpDir, 'package.json'),
+        JSON.stringify({ dependencies: { next: '14' } })
+      );
+      expect(findProxyPath(tmpDir)).toBeNull();
+    });
+
+    it('returns path to proxy.ts at root when present', () => {
+      const p = join(tmpDir, 'proxy.ts');
+      writeFileSync(p, 'export const proxy = () => {}');
+      expect(findProxyPath(tmpDir)).toBe(p);
+    });
+
+    it('returns path to src/proxy.ts when present and root has none', () => {
+      mkdirSync(join(tmpDir, 'src'), { recursive: true });
+      const p = join(tmpDir, 'src', 'proxy.ts');
+      writeFileSync(p, 'export const proxy = () => {}');
+      expect(findProxyPath(tmpDir)).toBe(p);
+    });
+  });
+
+  describe('getProxyWritePath', () => {
+    it('returns root proxy.ts when no src/app or src/pages', () => {
+      expect(getProxyWritePath(tmpDir)).toBe(join(tmpDir, 'proxy.ts'));
+    });
+
+    it('returns src/proxy.ts when src/app exists', () => {
+      mkdirSync(join(tmpDir, 'src', 'app'), { recursive: true });
+      expect(getProxyWritePath(tmpDir)).toBe(
+        join(tmpDir, 'src', 'proxy.ts')
+      );
+    });
+  });
+
+  describe('generateProxyContent', () => {
+    it('returns protect-all proxy snippet when no options', () => {
+      const out = generateProxyContent({});
+      expect(out).toContain('protectAll: true');
+      expect(out).toContain('export const proxy =');
+      expect(out).toContain('@tommyvez/passfort/next');
+    });
+
+    it('returns block-only proxy snippet when block: true', () => {
+      const out = generateProxyContent({ block: true });
+      expect(out).toContain('blockOnly: true');
+      expect(out).toContain('export const proxy =');
     });
   });
 
@@ -251,12 +310,24 @@ describe('init-middleware', () => {
       const mwPath = join(tmpDir, 'middleware.ts');
       writeFileSync(
         mwPath,
-        "import { withPasswordProtect } from 'passfort/next';\nexport default withPasswordProtect({});"
+        "import { withPasswordProtect } from '@tommyvez/passfort/next';\nexport default withPasswordProtect({});"
       );
       const result = runInit({ startDir: tmpDir });
       expect(result.ok).toBe(false);
       expect(result.ok === false && result.reason).toBe('already_set_up');
       expect(result.ok === false && result.path).toBe(mwPath);
+    });
+
+    it('returns already_set_up when middleware contains legacy passfort/next', () => {
+      setupNextProject(tmpDir);
+      const mwPath = join(tmpDir, 'middleware.ts');
+      writeFileSync(
+        mwPath,
+        "import { withPasswordProtect } from 'passfort/next';\nexport default withPasswordProtect({});"
+      );
+      const result = runInit({ startDir: tmpDir });
+      expect(result.ok).toBe(false);
+      expect(result.ok === false && result.reason).toBe('already_set_up');
     });
 
     it('returns middleware_exists when middleware exists without passfort', () => {
@@ -277,6 +348,50 @@ describe('init-middleware', () => {
       writeFileSync(mwPath, original);
       runInit({ startDir: tmpDir });
       expect(readFileSync(mwPath, 'utf-8')).toBe(original);
+    });
+
+    it('creates proxy.ts at root when useProxy and no src/app', () => {
+      setupNextProject(tmpDir);
+      const result = runInit({ startDir: tmpDir, useProxy: true });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.path).toBe(join(tmpDir, 'proxy.ts'));
+      expect(existsSync(result.path)).toBe(true);
+      const content = readFileSync(result.path, 'utf-8');
+      expect(content).toContain('export const proxy =');
+      expect(content).toContain('@tommyvez/passfort/next');
+    });
+
+    it('creates src/proxy.ts when useProxy and src/app exists', () => {
+      setupNextProject(tmpDir);
+      mkdirSync(join(tmpDir, 'src', 'app'), { recursive: true });
+      const result = runInit({ startDir: tmpDir, useProxy: true });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.path).toBe(join(tmpDir, 'src', 'proxy.ts'));
+    });
+
+    it('returns proxy_exists when proxy.ts exists without passfort', () => {
+      setupNextProject(tmpDir);
+      const proxyPath = join(tmpDir, 'proxy.ts');
+      writeFileSync(proxyPath, 'export const proxy = () => {}');
+      const result = runInit({ startDir: tmpDir, useProxy: true });
+      expect(result.ok).toBe(false);
+      expect(result.ok === false && result.reason).toBe('proxy_exists');
+      expect(result.ok === false && result.path).toBe(proxyPath);
+    });
+
+    it('returns already_set_up when proxy exists and contains passfort', () => {
+      setupNextProject(tmpDir);
+      const proxyPath = join(tmpDir, 'proxy.ts');
+      writeFileSync(
+        proxyPath,
+        "import { withPasswordProtect } from '@tommyvez/passfort/next';\nexport const proxy = withPasswordProtect({});"
+      );
+      const result = runInit({ startDir: tmpDir, useProxy: true });
+      expect(result.ok).toBe(false);
+      expect(result.ok === false && result.reason).toBe('already_set_up');
+      expect(result.ok === false && result.path).toBe(proxyPath);
     });
   });
 });
