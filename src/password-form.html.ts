@@ -141,6 +141,26 @@ export function getPasswordFormHtml(
       font-size: 0.8125rem;
       margin-top: -0.25rem;
     }
+    .back {
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid ${colors.inputBorder};
+    }
+    .back a {
+      color: ${colors.muted};
+      font-size: 0.875rem;
+      text-decoration: none;
+      display: inline-block;
+      min-height: 2.75rem;
+      line-height: 2.75rem;
+      padding: 0 0.25rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .back a:hover { color: ${colors.bodyColor}; }
+    .back a:focus {
+      outline: none;
+      color: ${colors.focusBorder};
+    }
   </style>
 </head>
 <body>
@@ -153,6 +173,7 @@ export function getPasswordFormHtml(
       ${error ? `<p class="error">Incorrect password. Try again.</p>` : ''}
       <button type="submit">${escapeHtml(buttonText)}</button>
     </form>
+    <p class="back"><a href="/">← Back to home</a></p>
   </div>
 </body>
 </html>`;

@@ -18,8 +18,8 @@ Or if using the published npm package:
 ```bash
 npx create-next-app@latest my-app --typescript
 cd my-app
-pnpm add passfort
-# or: npm install passfort
+pnpm add @tommyvez/passfort
+# or: npm install @tommyvez/passfort
 ```
 
 ## Step 2: Add the middleware
@@ -27,9 +27,23 @@ pnpm add passfort
 Create or update `middleware.ts` at your **project root** (same level as `app/`):
 
 ```typescript
-import { withPasswordProtect } from 'passfort/next';
+import { withPasswordProtect } from '@tommyvez/passfort/next';
 
 export default withPasswordProtect({
+  paths: ['/admin', '/dashboard', '/protected'],
+});
+
+export const config = {
+  matcher: ['/admin/:path*', '/dashboard/:path*', '/protected/:path*'],
+};
+```
+
+**Next 16+ (proxy):** If you use Next.js 16+, you can use `proxy.ts` instead. Run `npx passfort init --proxy` or create `proxy.ts` with:
+
+```typescript
+import { withPasswordProtect } from '@tommyvez/passfort/next';
+
+export const proxy = withPasswordProtect({
   paths: ['/admin', '/dashboard', '/protected'],
 });
 
@@ -99,9 +113,11 @@ Add the output as `PASSFORT_HASH` in Vercel. Remove `PASSFORT_PASSWORD`.
 
 ## Protecting the entire site
 
-To protect everything except static assets:
+To protect everything except static assets (middleware):
 
 ```typescript
+import { withPasswordProtect } from '@tommyvez/passfort/next';
+
 export default withPasswordProtect({
   protectAll: true,
   excludePaths: ['/login'],
@@ -112,11 +128,15 @@ export const config = {
 };
 ```
 
+For Next 16+ proxy, use `export const proxy = withPasswordProtect({ ... })` in `proxy.ts`.
+
 ## Customizing the form
 
-**In middleware.ts:**
+**In middleware.ts or proxy.ts:**
 
 ```typescript
+import { withPasswordProtect } from '@tommyvez/passfort/next';
+
 withPasswordProtect({
   paths: ['/admin'],
   form: {

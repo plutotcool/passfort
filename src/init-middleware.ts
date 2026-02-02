@@ -6,7 +6,9 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, resolve } from 'path';
 
-export const MATCHER_SNIPPET = `import { withPasswordProtect } from 'passfort/next';
+const PACKAGE_IMPORT = "@tommyvez/passfort/next";
+
+export const MATCHER_SNIPPET = `import { withPasswordProtect } from '${PACKAGE_IMPORT}';
 
 export default withPasswordProtect({ protectAll: true });
 
@@ -15,9 +17,27 @@ export const config = {
 };
 `;
 
-export const MATCHER_BLOCK_SNIPPET = `import { withPasswordProtect } from 'passfort/next';
+export const MATCHER_BLOCK_SNIPPET = `import { withPasswordProtect } from '${PACKAGE_IMPORT}';
 
 export default withPasswordProtect({ protectAll: true, blockOnly: true });
+
+export const config = {
+  matcher: ['/((?!api|_next|favicon.ico).*)'],
+};
+`;
+
+export const PROXY_SNIPPET = `import { withPasswordProtect } from '${PACKAGE_IMPORT}';
+
+export const proxy = withPasswordProtect({ protectAll: true });
+
+export const config = {
+  matcher: ['/((?!api|_next|favicon.ico).*)'],
+};
+`;
+
+export const PROXY_BLOCK_SNIPPET = `import { withPasswordProtect } from '${PACKAGE_IMPORT}';
+
+export const proxy = withPasswordProtect({ protectAll: true, blockOnly: true });
 
 export const config = {
   matcher: ['/((?!api|_next|favicon.ico).*)'],
@@ -89,7 +109,7 @@ export function generateMiddlewareContent(opts: {
     const matcherList = opts.paths
       .map((p) => `'${p.startsWith('/') ? p : '/' + p}/:path*'`)
       .join(', ');
-    return `import { withPasswordProtect } from 'passfort/next';
+    return `import { withPasswordProtect } from '${PACKAGE_IMPORT}';
 
 export default withPasswordProtect({
   paths: [${pathList}],
@@ -103,34 +123,114 @@ export const config = {
   return MATCHER_SNIPPET.trim();
 }
 
+/**
+ * Generate proxy.ts file content for the given options (Next 16+).
+ */
+export function generateProxyContent(opts: {
+  block?: boolean;
+  paths?: string[];
+}): string {
+  if (opts.block) return PROXY_BLOCK_SNIPPET.trim();
+  if (opts.paths && opts.paths.length > 0) {
+    const pathList = opts.paths
+      .map((p) => `'${p.startsWith('/') ? p : '/' + p}'`)
+      .join(', ');
+    const matcherList = opts.paths
+      .map((p) => `'${p.startsWith('/') ? p : '/' + p}/:path*'`)
+      .join(', ');
+    return `import { withPasswordProtect } from '${PACKAGE_IMPORT}';
+
+export const proxy = withPasswordProtect({
+  paths: [${pathList}],
+});
+
+export const config = {
+  matcher: [${matcherList}],
+};
+`;
+  }
+  return PROXY_SNIPPET.trim();
+}
+
+/**
+ * Return path to existing proxy file if present (root or src/proxy.ts|.js).
+ */
+export function findProxyPath(root: string): string | null {
+  const atRoot = join(root, 'proxy.ts');
+  if (existsSync(atRoot)) return atRoot;
+  if (existsSync(join(root, 'proxy.js'))) return join(root, 'proxy.js');
+  const atSrc = join(root, 'src', 'proxy.ts');
+  if (existsSync(atSrc)) return atSrc;
+  if (existsSync(join(root, 'src', 'proxy.js')))
+    return join(root, 'src', 'proxy.js');
+  return null;
+}
+
+/**
+ * Path where proxy should be written: src/proxy.ts if src/app or src/pages exists, else root proxy.ts.
+ */
+export function getProxyWritePath(root: string): string {
+  const hasSrcApp =
+    existsSync(join(root, 'src', 'app')) ||
+    existsSync(join(root, 'src', 'pages'));
+  return hasSrcApp
+    ? join(root, 'src', 'proxy.ts')
+    : join(root, 'proxy.ts');
+}
+
+function contentHasPassfort(content: string): boolean {
+  return (
+    content.includes('withPasswordProtect') ||
+    content.includes('@tommyvez/passfort/next') ||
+    content.includes('passfort/next')
+  );
+}
+
 export type InitResult =
   | { ok: true; path: string }
   | {
       ok: false;
-      reason: 'not_next' | 'middleware_exists' | 'already_set_up';
+      reason:
+        | 'not_next'
+        | 'middleware_exists'
+        | 'proxy_exists'
+        | 'already_set_up';
       path?: string;
     };
 
 /**
- * Run init: find Next.js root, ensure no conflicting middleware, write middleware file.
- * Uses startDir to locate project (e.g. process.cwd() from CLI).
+ * Run init: find Next.js root, ensure no conflicting middleware/proxy, write file.
+ * When useProxy is true, creates proxy.ts (Next 16+); otherwise middleware.ts.
  */
 export function runInit(options: {
   startDir: string;
   block?: boolean;
   paths?: string[];
+  useProxy?: boolean;
 }): InitResult {
-  const { startDir, block, paths } = options;
+  const { startDir, block, paths, useProxy } = options;
   const root = findNextProjectRoot(startDir);
   if (!root) return { ok: false, reason: 'not_next' };
+
+  if (useProxy) {
+    const existingPath = findProxyPath(root);
+    if (existingPath) {
+      const content = readFileSync(existingPath, 'utf-8');
+      if (contentHasPassfort(content)) {
+        return { ok: false, reason: 'already_set_up', path: existingPath };
+      }
+      return { ok: false, reason: 'proxy_exists', path: existingPath };
+    }
+    const outPath = getProxyWritePath(root);
+    const content = generateProxyContent({ block, paths });
+    writeFileSync(outPath, content + '\n', 'utf-8');
+    return { ok: true, path: outPath };
+  }
 
   const existingPath = findMiddlewarePath(root);
   if (existingPath) {
     const content = readFileSync(existingPath, 'utf-8');
-    if (
-      content.includes('withPasswordProtect') ||
-      content.includes('passfort/next')
-    ) {
+    if (contentHasPassfort(content)) {
       return { ok: false, reason: 'already_set_up', path: existingPath };
     }
     return { ok: false, reason: 'middleware_exists', path: existingPath };

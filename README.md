@@ -13,7 +13,7 @@ pnpm add @tommyvez/passfort
 # or: npm install @tommyvez/passfort
 ```
 
-### 2. Add Middleware (Next.js)
+### 2. Add Middleware or Proxy (Next.js)
 
 **Automated:** from your Next.js project root, run:
 
@@ -26,7 +26,7 @@ This creates `middleware.ts` (or `src/middleware.ts` if you use `src/`) and wire
 - `npx passfort init --paths=/admin,/dashboard` — protect only those paths
 - `npx passfort init --block` — maintenance mode (503, no form)
 
-**Manual:** run `npx passfort matcher` and paste the output into `middleware.ts`, or add:
+**Manual (middleware):** run `npx passfort matcher` and paste the output into `middleware.ts`, or add:
 
 ```typescript
 import { withPasswordProtect } from '@tommyvez/passfort/next';
@@ -38,6 +38,22 @@ export const config = {
   matcher: ['/((?!api|_next|favicon.ico).*)'],
 };
 ```
+
+**Next 16+ (proxy):** Next.js 16 renamed middleware to [proxy](https://nextjs.org/docs/app/api-reference/file-conventions/proxy). Use `proxy.ts` and export the handler as named `proxy`; the API is the same:
+
+```typescript
+// proxy.ts (Next 16+)
+import { withPasswordProtect } from '@tommyvez/passfort/next';
+
+export const proxy = withPasswordProtect({ protectAll: true });
+// or: paths: ['/admin', '/preview'], for specific routes only
+
+export const config = {
+  matcher: ['/((?!api|_next|favicon.ico).*)'],
+};
+```
+
+You can migrate existing `middleware.ts` with the official codemod: `npx @next/codemod@canary middleware-to-proxy .`
 
 ### 3. Set Environment Variables
 
