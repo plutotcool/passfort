@@ -1,5 +1,5 @@
 {
-  "name": "passfort",
+  "name": "@tommyvez/passfort",
   "version": "1.0.0",
   "description": "Password protection for Vercel deployments. No $150/month required.",
   "type": "module",

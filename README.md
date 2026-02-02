@@ -9,8 +9,8 @@ Protect your entire site or specific routes behind a password with a few lines o
 ### 1. Install
 
 ```bash
-pnpm add passfort
-# or: npm install passfort
+pnpm add @tommyvez/passfort
+# or: npm install @tommyvez/passfort
 ```
 
 ### 2. Add Middleware (Next.js)
@@ -29,7 +29,7 @@ This creates `middleware.ts` (or `src/middleware.ts` if you use `src/`) and wire
 **Manual:** run `npx passfort matcher` and paste the output into `middleware.ts`, or add:
 
 ```typescript
-import { withPasswordProtect } from 'passfort/next';
+import { withPasswordProtect } from '@tommyvez/passfort/next';
 
 export default withPasswordProtect({ protectAll: true });
 // or: paths: ['/admin', '/preview'], for specific routes only
@@ -97,7 +97,7 @@ Set in Vercel → Settings → Environment Variables:
 Minimal middleware:
 
 ```typescript
-import { withPasswordProtect } from 'passfort/next';
+import { withPasswordProtect } from '@tommyvez/passfort/next';
 
 export default withPasswordProtect({});
 
