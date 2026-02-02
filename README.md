@@ -1,6 +1,6 @@
 # passfort
 
-**Password protection for Vercel deployments.** No $150/month required. Works on Hobby plan.
+**Password [protection](https://www.passfort.net/) for Vercel deployments.** No $150/month required. Works on Hobby plan.
 
 Protect your entire site or specific routes behind a password with a few lines of code.
 
