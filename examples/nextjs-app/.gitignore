@@ -1,0 +1,14 @@
+# Dependencies and build (when used standalone)
+node_modules
+.next
+out
+.vercel
+
+# Environment (never commit)
+.env
+.env.local
+.env.*.local
+
+# Logs and OS
+*.log
+.DS_Store
