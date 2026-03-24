@@ -9,8 +9,8 @@ Protect your entire site or specific routes behind a password with a few lines o
 ### 1. Install
 
 ```bash
-pnpm add @tommyvez/passfort
-# or: npm install @tommyvez/passfort
+pnpm add @plutotcool/passfort
+# or: npm install @plutotcool/passfort
 ```
 
 ### 2. Add Middleware or Proxy (Next.js)
