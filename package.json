@@ -1,7 +1,7 @@
 {
   "name": "@tommyvez/passfort",
   "version": "1.1.0",
-  "description": "Password protection for Vercel deployments. No $150/month required.",
+  "description": "Password protection for Vercel deployments.",
   "type": "module",
   "exports": {
     ".": {
@@ -51,7 +51,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tommyv1987/passfort"
+    "url": "https://github.com/plutotcool/passfort"
   },
   "peerDependencies": {
     "next": ">=14.0.0"
