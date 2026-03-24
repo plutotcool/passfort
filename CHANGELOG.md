@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.1.1
+
+
+### 🩹 Fixes
+
+- Adapt tests to default form template options ([226923e](https://github.com/plutotcool/passfort/commit/226923e))
+
+### ❤️ Contributors
+
+- Juliendargelos <hello@julien.gl>
+
 ## v1.1.0
 
 
