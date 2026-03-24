@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.1.2
+
+
+### 🩹 Fixes
+
+- Install dependencies in release workflow ([f051b53](https://github.com/plutotcool/passfort/commit/f051b53))
+
+### ❤️ Contributors
+
+- Juliendargelos <hello@julien.gl>
+
 ## v1.1.1
 
 
