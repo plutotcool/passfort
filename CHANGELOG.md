@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.1.3
+
+
+### 🩹 Fixes
+
+- Remove private field from changelog config ([ef272bd](https://github.com/plutotcool/passfort/commit/ef272bd))
+
+### ❤️ Contributors
+
+- Juliendargelos <hello@julien.gl>
+
 ## v1.1.2
 
 
