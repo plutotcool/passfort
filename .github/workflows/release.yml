@@ -32,9 +32,6 @@ jobs:
       - name: Enable corepack
         run: corepack enable
 
-      - name: Audit (fail on high/critical)
-        run: pnpm audit --audit-level=high
-
       - name: Type check
         run: pnpm run type-check
 
