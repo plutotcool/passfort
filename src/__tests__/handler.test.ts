@@ -77,8 +77,8 @@ describe('handlePasswordProtect', () => {
     expect(res).not.toBeNull();
     expect(res?.status).toBe(401);
     const text = await res?.text();
-    expect(text).toContain('Password Required');
-    expect(text).toContain('Back to home');
+    expect(text).toContain('Protected page');
+    expect(text).toContain('Continue');
   });
 
   it('returns 302 with Set-Cookie on correct password', async () => {
