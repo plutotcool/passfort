@@ -17,19 +17,44 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
       - name: Setup git identity
         run: |
           git config --local user.email "plutotcool+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version-file: 'package.json'
           registry-url: 'https://npm.pkg.github.com'
+
       - name: Enable corepack
         run: corepack enable
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+
+      - name: Audit (fail on high/critical)
+        run: pnpm audit --audit-level=high
+
+      - name: Type check
+        run: pnpm run type-check
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Test
+        run: pnpm run test:coverage
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: E2E tests
+        run: pnpm run e2e
+        env:
+          CI: 'true'
+
       - name: Release package
         run: pnpm release
         env:
