@@ -39,7 +39,7 @@ export async function handlePasswordProtect(
   // Block-only (maintenance mode): no form, no auth, just 503
   if (config.blockOnly) {
     return new Response(
-      `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Unavailable</title></head><body style="font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0"><p style="color:#5f6368">Temporarily unavailable.</p></body></html>`,
+      `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Access not permitted</title></head><body style="background:#000;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0"><p style="color:oklch(0.708 0 0);padding:0 20px;box-sizing:border-box;text-align:center;line-height:1.4;font-size:0.875rem">Access to this page is not permitted at the moment.</p></body></html>`,
       {
         status: 503,
         headers: {
