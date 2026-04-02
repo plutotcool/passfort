@@ -62,7 +62,7 @@ describe('handlePasswordProtect', () => {
     expect(res).not.toBeNull();
     expect(res?.status).toBe(503);
     const text = await res?.text();
-    expect(text).toContain('Temporarily unavailable');
+    expect(text).toContain('Access not permitted');
     expect(text).not.toContain('Password');
   });
 
