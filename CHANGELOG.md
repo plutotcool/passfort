@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.2.0
+
+
+### 🚀 Enhancements
+
+- Change expected error message in handler test ([f18761a](https://github.com/plutotcool/passfort/commit/f18761a))
+
+### ❤️ Contributors
+
+- Julien Dargelos ([@juliendargelos](https://github.com/juliendargelos))
+
 ## v1.1.3
 
 
