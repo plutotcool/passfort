@@ -8,9 +8,19 @@ Protect your entire site or specific routes behind a password with a few lines o
 
 ### 1. Install
 
+In your `.npmrc`, make sure the `@plutotcool` scope is set to use the GitHub
+packages registry:
+
+```
+# .npmrc
+
+@plutotcool:registry=https://npm.pkg.github.com
+```
+
+Then add the package to your project:
+
 ```bash
 pnpm add @plutotcool/passfort
-# or: npm install @plutotcool/passfort
 ```
 
 ### 2. Add Middleware or Proxy (Next.js)
