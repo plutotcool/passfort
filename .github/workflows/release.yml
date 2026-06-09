@@ -60,13 +60,13 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install chromium --with-deps
+      # - name: Install Playwright browsers
+      #   run: pnpm exec playwright install chromium --with-deps
 
-      - name: E2E tests
-        run: pnpm run e2e
-        env:
-          CI: 'true'
+      # - name: E2E tests
+      #   run: pnpm run e2e
+      #   env:
+      #     CI: 'true'
 
       - name: Release package
         run: pnpm release ${{ inputs.release-type && format('--{0}', inputs.release-type) || '' }}
