@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.2.2
+
+
+### 🤖 CI
+
+- Disable e2e tests ([4e07e0f](https://github.com/plutotcool/passfort/commit/4e07e0f))
+
+### ❤️ Contributors
+
+- Juliendargelos <hello@julien.gl>
+
 ## v1.2.1
 
 ## v1.2.0
