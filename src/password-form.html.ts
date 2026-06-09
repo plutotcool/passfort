@@ -11,6 +11,7 @@ const DEFAULTS: Required<FormOptions> = {
   placeholder: 'Password',
   buttonText: 'Continue',
   theme: 'dark',
+  email: "tech@plutot.cool"
 };
 
 const THEMES = {
@@ -60,6 +61,7 @@ export function getPasswordFormHtml(
     placeholder = DEFAULTS.placeholder,
     buttonText = DEFAULTS.buttonText,
     theme = DEFAULTS.theme,
+    email = DEFAULTS.email
   } = options;
 
   const colors = THEMES[theme];
@@ -161,6 +163,7 @@ export function getPasswordFormHtml(
     <p>${escapeHtml(description)}</p>
     <form method="POST" action="">
       <input type="hidden" name="return_url" value="${escapeHtml(returnUrl)}">
+      <input type="hidden" autocomplete="username" value="${escapeHtml(email)}">
       <input type="password" name="password" placeholder="${escapeHtml(placeholder)}" required autocomplete="current-password" autofocus>
       ${error ? `<p class="error">Incorrect password.</p>` : ''}
       <button type="submit">${escapeHtml(buttonText)}</button>

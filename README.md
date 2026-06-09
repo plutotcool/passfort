@@ -69,14 +69,15 @@ You can migrate existing `middleware.ts` with the official codemod: `npx @next/c
 
 In Vercel Dashboard → Project → Settings → Environment Variables:
 
-| Variable            | Required | Description                                                                                             |
-| ------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-| `PASSFORT_SECRET`   | Yes      | Min 16 chars. For session signing. Generate: `openssl rand -base64 24`                                  |
-| `PASSFORT_PASSWORD` | Yes\*    | Plain password (quick start)                                                                            |
-| `PASSFORT_HASH`     | Yes\*    | PBKDF2 hash (production) - use `npx passfort hash "pass"`                                               |
-| `PASSFORT_ENABLED`  | No       | Set to `false` or `0` to turn protection off without code changes. Redeploy and protection is disabled. |
-| `PASSFORT_RATE_LIMIT_MAX` | No | Max password attempts per client IP per window (default 10). Set to `0` to disable. |
-| `PASSFORT_RATE_LIMIT_WINDOW_MS` | No | Rate limit window in ms (default 60000). |
+| Variable            | Required | Description                                                                                                |
+| ------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `PASSFORT_SECRET`   | Yes      | Min 16 chars. For session signing. Generate: `openssl rand -base64 24`                                     |
+| `PASSFORT_PASSWORD` | Yes\*    | Plain password (quick start)                                                                               |
+| `PASSFORT_HASH`     | Yes\*    | PBKDF2 hash (production) - use `npx passfort hash "pass"`                                                  |
+| `PASSFORT_EMAIL`    | No       | Email prefilled in a hidden field of the form to enable password autocomplete (default: tech@plutot.cool). |
+| `PASSFORT_ENABLED`  | No       | Set to `false` or `0` to turn protection off without code changes. Redeploy and protection is disabled.    |
+| `PASSFORT_RATE_LIMIT_MAX` | No | Max password attempts per client IP per window (default 10). Set to `0` to disable.                        |
+| `PASSFORT_RATE_LIMIT_WINDOW_MS` | No | Rate limit window in ms (default 60000).                                                             |
 
 \*Use either `PASSFORT_PASSWORD` or `PASSFORT_HASH`, not both.
 

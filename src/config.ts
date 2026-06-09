@@ -13,6 +13,8 @@ export interface FormOptions {
   buttonText?: string;
   /** Visual theme: "dark" | "light" (default: "dark") */
   theme?: 'dark' | 'light';
+  /** Email, hidden in the form to enable password autofill (default: "tech@plutot.cool") **/
+  email?: string
 }
 
 export interface PasswordProtectConfig {
@@ -117,11 +119,13 @@ export function loadConfig(
   const formButton =
     env.PASSFORT_FORM_BUTTON ?? env.PASSWORD_PROTECT_FORM_BUTTON;
   const formTheme = env.PASSFORT_FORM_THEME ?? env.PASSWORD_PROTECT_FORM_THEME;
+  const formEmail = env.PASSFORT_FORM_EMAIL ?? env.PASSWORD_PROTECT_FORM_EMAIL;
   if (formTitle) form.title = formTitle;
   if (formDesc) form.description = formDesc;
   if (formPlaceholder) form.placeholder = formPlaceholder;
   if (formButton) form.buttonText = formButton;
   if (formTheme === 'light') form.theme = 'light';
+  if (formEmail) form.email = formEmail;
 
   const loginPath =
     env.PASSFORT_LOGIN_PATH ??
